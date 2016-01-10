@@ -39,9 +39,9 @@
  */
 package org.glassfish.ozark.core;
 
+import org.glassfish.ozark.cxf.CxfVariantSelector;
 import org.glassfish.ozark.event.AfterControllerEventImpl;
 import org.glassfish.ozark.event.ControllerRedirectEventImpl;
-import org.glassfish.ozark.jersey.VariantSelector;
 
 import javax.annotation.Priority;
 import javax.enterprise.event.Event;
@@ -84,7 +84,7 @@ import static org.glassfish.ozark.util.PathUtils.noStartingSlash;
  * and ensures that the entity is a {@link javax.mvc.Viewable} to be processed by
  * {@link org.glassfish.ozark.core.ViewableWriter}.</p>
  *
- * <p>A {@link org.glassfish.ozark.jersey.VariantSelector} implements the algorithm in
+ * <p>A {@link CxfVariantSelector} implements the algorithm in
  * Section 3.8 of the JAX-RS specification to compute the final Content-Type when
  * the method returns void (no entity). If unable to compute the final Content-Type,
  * e.g. if the controller method is not annotated by {@code @Produces}, it defaults to
@@ -144,7 +144,7 @@ public class ViewResponseFilter implements ContainerResponseFilter {
                 an = getAnnotation(resourceInfo.getResourceClass(), View.class);
             }
             if (an != null) {
-                MediaType contentType = VariantSelector.selectVariant(request, resourceInfo);
+                MediaType contentType = CxfVariantSelector.selectVariant(request, resourceInfo);
                 if (contentType == null) {
                     contentType = MediaType.TEXT_HTML_TYPE;     // default
                 }
