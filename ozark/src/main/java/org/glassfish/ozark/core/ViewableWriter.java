@@ -72,6 +72,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -98,6 +99,7 @@ import static org.glassfish.ozark.util.PathUtils.ensureStartingSlash;
  *
  * @author Santiago Pericas-Geertsen
  */
+@Provider
 @Produces(MediaType.WILDCARD)
 public class ViewableWriter implements MessageBodyWriter<Viewable> {
 
@@ -246,7 +248,15 @@ public class ViewableWriter implements MessageBodyWriter<Viewable> {
      * @return Character set to use.
      */
     private Charset getCharset(MultivaluedMap<String, Object> headers) {
-        final MediaType mt = (MediaType) headers.get(CONTENT_TYPE).get(0);
+        final MediaType mt;
+
+        if (MediaType.class.isInstance(headers.get(CONTENT_TYPE).get(0))) {
+            mt = MediaType.class.cast(headers.get(CONTENT_TYPE).get(0));
+        } else {
+            final String mediaTypeStr = headers.get(CONTENT_TYPE).get(0).toString();
+            mt = MediaType.valueOf(mediaTypeStr);
+        }
+
         final String charset = mt.getParameters().get(MediaType.CHARSET_PARAMETER);
         return charset != null ? Charset.forName(charset) : UTF8;
     }

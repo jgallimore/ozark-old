@@ -19,6 +19,8 @@
 
 package org.glassfish.ozark.cxf;
 
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.endpoint.Server;
 import org.apache.openejb.observer.Observes;
 import org.apache.openejb.server.cxf.rs.event.ServerCreated;
 import org.apache.webbeans.config.WebBeansContext;
@@ -36,11 +38,11 @@ public class ServerCreatedExtension {
             throw new IllegalStateException("Cannot retrieve the CDI Bean Manager Context");
         }
 
-//        final Endpoint endpoint = event.getServer().getEndpoint();
-//        endpoint.getInInterceptors().add(new JAXRSBeanValidationInInterceptor()); // TODO validation interceptor goes here
+        final Endpoint endpoint = event.getServer().getEndpoint();
+        endpoint.getInInterceptors().add(new BindingInterceptorImpl());
 
         final BeanManagerImpl beanManager = webBeansContext.getBeanManagerImpl();
-        final MvcContextImpl mvc = (MvcContextImpl) newBean(beanManager, MvcContextImpl.class);
+        final MvcContextImpl mvc = newBean(beanManager, MvcContextImpl.class);
         mvc.setApplicationPath(event.getWebContext().getContextRoot());
     }
 

@@ -67,7 +67,7 @@ public class CxfOzarkFeature implements DynamicFeature {
         registerIfNeeded(context, config, ViewRequestFilter.class);
         registerIfNeeded(context, config, ViewResponseFilter.class);
         registerIfNeeded(context, config, ViewableWriter.class);
-        //registerIfNeeded(context, config, BindingInterceptorImpl.class);
+        registerIfNeeded(context, config, BindingInterceptorImpl.class);
         registerIfNeeded(context, config, CsrfValidateInterceptor.class);
         registerIfNeeded(context, config, CsrfProtectFilter.class);
 
