@@ -89,7 +89,7 @@
         <dependency>
             <groupId>org.apache.tomee</groupId>
             <artifactId>openejb-api</artifactId>
-            <version>7.0.0-SNAPSHOT</version>
+            <version>${tomee.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
