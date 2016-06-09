@@ -39,17 +39,10 @@
  */
 package org.glassfish.ozark.binding;
 
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.spi.Context;
-import javax.enterprise.context.spi.CreationalContext;
-import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
 import javax.mvc.binding.BindingError;
 import javax.mvc.binding.BindingResult;
 import javax.validation.ConstraintViolation;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -73,7 +66,7 @@ public final class BindingResultUtils {
         try {
             TARGET_INSTANCE = ccl.loadClass("org.jboss.weld.interceptor.util.proxy.TargetInstanceProxy");
         } catch (ClassNotFoundException e) {
-            TARGET_INSTANCE = null;
+            throw new RuntimeException(e);
         }
     }
 
@@ -167,28 +160,18 @@ public final class BindingResultUtils {
                 final Object obj = getBindingResultGetter(resource).invoke(resource);
                 getSetterMethod(obj, "setViolations").invoke(obj, violations);
             } else {
-
-                // lookup an injected bean using the CDI bean manager
-                final BeanManager bm = CDI.current().getBeanManager();
-                final BindingResult bindingResult = getBeanInstance(
-                        BindingResult.class, RequestScoped.class, bm);
-
-                if (BindingResultImpl.class.isInstance(bindingResult)) {
-                    BindingResultImpl.class.cast(bindingResult).setViolations(violations);
-                }
-
                 // Then check for a field
-//                final Field vr = getBindingResultField(resource);
-//                if (vr != null) {
-//                    AccessController.doPrivileged((java.security.PrivilegedAction<Void>) () -> {
-//                        vr.setAccessible(true);
-//                        return null;
-//                    });
-//                    final BindingResultImpl value = (BindingResultImpl) vr.get(resource);
-//                    value.setViolations(violations);
-//                } else {
-//                    return false;
-//                }
+                final Field vr = getBindingResultField(resource);
+                if (vr != null) {
+                    AccessController.doPrivileged((java.security.PrivilegedAction<Void>) () -> {
+                        vr.setAccessible(true);
+                        return null;
+                    });
+                    final BindingResultImpl value = (BindingResultImpl) vr.get(resource);
+                    value.setViolations(violations);
+                } else {
+                    return false;
+                }
             }
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -311,7 +294,7 @@ public final class BindingResultUtils {
      * @return outcome of test.
      */
     public static boolean isTargetInstanceProxy(Object obj) {
-        return TARGET_INSTANCE != null && TARGET_INSTANCE.isAssignableFrom(obj.getClass());
+        return TARGET_INSTANCE.isAssignableFrom(obj.getClass());
     }
 
     /**
@@ -352,14 +335,5 @@ public final class BindingResultUtils {
             }
         }
         return null;
-    }
-
-    public static <T> T getBeanInstance(final Class<T> type, final Class<? extends Annotation> scope, final BeanManager beanManager) {
-        final Context context = beanManager.getContext(scope);
-        final Set<Bean<?>> beans = beanManager.getBeans(type);
-        final Bean<T> bean = (Bean<T>) beanManager.resolve(beans);
-        final CreationalContext<T> creationalContext = beanManager.createCreationalContext(bean);
-
-        return context.get(bean, creationalContext);
     }
 }

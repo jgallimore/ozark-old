@@ -249,14 +249,12 @@ public class ViewableWriter implements MessageBodyWriter<Viewable> {
      */
     private Charset getCharset(MultivaluedMap<String, Object> headers) {
         final MediaType mt;
-
         if (MediaType.class.isInstance(headers.get(CONTENT_TYPE).get(0))) {
             mt = MediaType.class.cast(headers.get(CONTENT_TYPE).get(0));
         } else {
             final String mediaTypeStr = headers.get(CONTENT_TYPE).get(0).toString();
             mt = MediaType.valueOf(mediaTypeStr);
         }
-
         final String charset = mt.getParameters().get(MediaType.CHARSET_PARAMETER);
         return charset != null ? Charset.forName(charset) : UTF8;
     }

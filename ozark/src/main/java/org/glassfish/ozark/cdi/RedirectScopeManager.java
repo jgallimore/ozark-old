@@ -303,7 +303,6 @@ public class RedirectScopeManager {
      * @return value of property.
      */
     private boolean usingCookies() {
-//        return PropertyUtils.getProperty(config, Properties.REDIRECT_SCOPE_COOKIES, false);
-        return false;
+        return PropertyUtils.getProperty(config, Properties.REDIRECT_SCOPE_COOKIES, false);
     }
 }

@@ -43,7 +43,14 @@ public class ServerCreatedExtension {
 
         final BeanManagerImpl beanManager = webBeansContext.getBeanManagerImpl();
         final MvcContextImpl mvc = newBean(beanManager, MvcContextImpl.class);
-        mvc.setApplicationPath(event.getWebContext().getContextRoot());
-    }
+        final String contextPath = event.getWebContext().getServletContext().getContextPath();
 
+        String mapping = event.getMapping();
+        if (mapping.startsWith(contextPath)) {
+            mapping = mapping.substring(contextPath.length());
+        }
+
+        mvc.setApplicationPath(mapping);
+        mvc.setContextPath(contextPath);
+    }
 }
